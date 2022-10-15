@@ -6,13 +6,14 @@ import Typography from '@mui/material/Typography';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import { useState } from 'react';
 
-import Title from './components/title'
+import Header from './components/header'
 
 
 const theme = createTheme({
   palette: {
     mode: 'dark',
-    text: {
+    primary: {
+      main:"#e53935"
     }
   }
 });
@@ -29,7 +30,7 @@ export default function App() {
           height: '100vh',
         }}
       >
-        <Title videoPresent={videoPresent} />
+        <Header videoPresent={videoPresent} setVideoPresent={setVideoPresent} />
       </Box>
     </ThemeProvider>
   );
