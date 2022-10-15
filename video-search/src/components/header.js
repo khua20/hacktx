@@ -1,12 +1,15 @@
-import Container from '@mui/material/Container';
 import Box from '@mui/material/Box';
-import AppBar from '@mui/material/AppBar';
-import Toolbar from '@mui/material/Toolbar';
+import Paper from '@mui/material/Paper';
 import Stack from '@mui/material/Stack';
 import Button from '@mui/material/Button';
-import AdbIcon from '@mui/icons-material/Adb';
 import Typography from '@mui/material/Typography';
+import TextField from "@mui/material/TextField";
+import IconButton from "@mui/material/IconButton";
+import SearchIcon from "@mui/icons-material/Search";
+import axios from 'axios';
+
 import { useTheme } from '@mui/material/styles';
+import { useState } from 'react';
 
 
 const titleVariants = {
@@ -19,7 +22,7 @@ export default function Header({ videoPresent, setVideoPresent }) {
   const theme = useTheme();
 
   return (
-    <Box sx={{
+    <Paper sx={{
       display: 'flex',
       flexDirection: videoPresent ? 'row' : 'column',
       justifyContent: 'center',
@@ -29,7 +32,7 @@ export default function Header({ videoPresent, setVideoPresent }) {
       <Title variant={titleVariants[videoPresent]} />
       <Search hidden={!videoPresent} />
       <UploadButton videoPresent={videoPresent} setVideoPresent={setVideoPresent} />
-    </Box>
+    </Paper>
   )
 }
 
@@ -58,17 +61,48 @@ function Title({ variant }) {
           userSelect: 'none',
         }}
       >
-        LOGO
+        VSearch
       </Typography>
     </Stack>
   )
 }
 
 function Search({ hidden }) {
+  const [searchQuery, setSearchQuery] = useState('');
+
   return (
-    <p>
-      hi
-    </p>
+    <form
+      sx={{
+        display: 'flex',
+        alignItems: 'center',
+      }}
+      hidden={hidden}
+    >
+      <TextField
+        id="search-bar"
+        className="text"
+        onInput={(e) => {
+          setSearchQuery(e.target.value);
+        }}
+        label="Enter a search query"
+        variant="outlined"
+        placeholder="Search..."
+        size="small"
+        sx={{
+          width: '50vw',
+          marginLeft: '5vw',
+        }}
+      />
+      <IconButton
+        type="submit"
+        aria-label="search"
+        sx={{
+          marginRight: '5vw',
+        }}
+      >
+        <SearchIcon />
+      </IconButton>
+    </form>
   )
 }
 
@@ -82,16 +116,24 @@ function UploadButton({ videoPresent, setVideoPresent }) {
       sx={{
         paddingLeft: videoPresent ? '1%' : '10%',
         paddingRight: videoPresent ? '1%' : '10%',
+        marginTop: videoPresent ? '0%' : '4%',
       }}
-      onClick={() => setVideoPresent(true)}
       component="label"
     >
       <Typography
         variant={videoPresent ? 'h6' : 'h4'}
       >
         {videoPresent ? 'Upload' : 'Upload a video to start'}
-        <input hidden accept="video/*" multiple type="file" />
-        
+        <input
+          hidden
+          accept="video/*"
+          type="file"
+          onChange={(e) => {
+            axios.post('localhost:5000/upload')
+            console.log(e.target.files[0])
+            setVideoPresent(true)
+          }}
+        />
       </Typography>
     </Button>
   )

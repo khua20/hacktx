@@ -7,13 +7,13 @@ import { ThemeProvider, createTheme } from '@mui/material/styles';
 import { useState } from 'react';
 
 import Header from './components/header'
-
+import Body from './components/body';
 
 const theme = createTheme({
   palette: {
     mode: 'dark',
     primary: {
-      main:"#e53935"
+      main:"#00ec98"
     }
   }
 });
@@ -31,6 +31,7 @@ export default function App() {
         }}
       >
         <Header videoPresent={videoPresent} setVideoPresent={setVideoPresent} />
+        {videoPresent ? <Body/> : <></>}
       </Box>
     </ThemeProvider>
   );
