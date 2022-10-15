@@ -11,8 +11,8 @@ import Title from './components/title'
 
 const theme = createTheme({
   palette: {
-    background: {
-      default: "#000"
+    mode: 'dark',
+    text: {
     }
   }
 });
@@ -23,7 +23,12 @@ export default function App() {
 
   return (
     <ThemeProvider theme={theme}>
-      <Box>
+      <Box
+        sx={{
+          backgroundColor: theme.palette.background.default,
+          height: '100vh',
+        }}
+      >
         <Title videoPresent={videoPresent} />
       </Box>
     </ThemeProvider>
