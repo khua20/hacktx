@@ -1,5 +1,5 @@
 import React from 'react'
-
+import { CardMedia } from '@mui/material'
 
 export default function Body() {
   return (
