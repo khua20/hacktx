@@ -18,7 +18,7 @@ const titleVariants = {
 }
 
 
-export default function Header({ videoPresent, setVideoPresent }) {
+export default function Header({ videoPresent, setVideoPresent, setTimestampScores }) {
   const theme = useTheme();
 
   return (
@@ -30,7 +30,7 @@ export default function Header({ videoPresent, setVideoPresent }) {
       height: videoPresent ? '10vh' : '100vh',
     }}>
       <Title variant={titleVariants[videoPresent]} />
-      <Search hidden={!videoPresent} />
+      <Search hidden={!videoPresent} setTimestampScores={setTimestampScores} />
       <UploadButton videoPresent={videoPresent} setVideoPresent={setVideoPresent} />
     </Paper>
   )
@@ -67,7 +67,7 @@ function Title({ variant }) {
   )
 }
 
-function Search({ hidden }) {
+function Search({ hidden, setTimestampScores }) {
   const [searchQuery, setSearchQuery] = useState('');
 
   return (
@@ -83,8 +83,12 @@ function Search({ hidden }) {
           params: {
             query: searchQuery,
           },
-        }).then((response) => {
-          console.log(response)
+        }).then((res) => {
+          if (res?.data?.success) {
+            setTimestampScores(res.data.similarities)
+          } else {
+            console.log('sad :( something messed up :(((( sad by xxxtentacion')
+          }
         })
       }}
     >
@@ -140,18 +144,19 @@ function UploadButton({ videoPresent, setVideoPresent }) {
           accept="video/*"
           type="file"
           onChange={(e) => {
-            setVideoPresent(true)
-            // const bodyFormData = new FormData();
-            // bodyFormData.append('video', e.target.files[0]);
+            // setVideoPresent(true)
+            const bodyFormData = new FormData();
+            bodyFormData.append('video', e.target.files[0]);
             
-            // axios({
-            //   method: 'post',
-            //   url: 'http://localhost:5000/upload',
-            //   data: bodyFormData,
-            //   headers: { 'Content-Type': 'multipart/form-data' },
-            // }).then((res) => {
-            //   setVideoPresent(res?.data?.success)
-            // })
+            axios({
+              method: 'post',
+              url: 'http://localhost:5000/upload',
+              data: bodyFormData,
+              headers: { 'Content-Type': 'multipart/form-data' },
+            }).then((res) => {
+              console.log('omg response!')
+              setVideoPresent(res?.data?.success)
+            })
           }}
         />
       </Typography>

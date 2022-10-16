@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request
+from flask import Flask, request, send_file
 from flask_cors import CORS
 from datetime import timedelta
 import cv2
@@ -8,8 +8,8 @@ import torch
 import clip
 from PIL import Image
 
-device = "cuda" if torch.cuda.is_available() else "cpu"
-model, preprocess = clip.load("ViT-B/32", device=device)
+device = 'cuda' if torch.cuda.is_available() else 'cpu'
+model, preprocess = clip.load('ViT-B/32', device=device)
 
 
 app = Flask(__name__)
@@ -18,19 +18,19 @@ CORS(app)
 
 @app.route('/')
 def main():
-    return "Please upload file"
+    return 'Please upload file'
 
 
-@app.route("/upload", methods=["POST"])
+@app.route('/upload', methods=['POST'])
 def upload():
     try:
-        if request.files.get("video") is None:
+        if request.files.get('video') is None:
             raise Exception('No video uploaded!')
         # Put here some other checks (security, file length etc...)
-        f = request.files["video"]
-        f.save('video.mp4')
+        f = request.files['video']
+        f.save('static/video.mp4')
 
-        cam = cv2.VideoCapture('video.mp4')
+        cam = cv2.VideoCapture('static/video.mp4')
         fps = cam.get(cv2.CAP_PROP_FPS)
         
         currentFrame = 0
@@ -45,9 +45,11 @@ def upload():
             currentFrame += 1
             ret, frame = cam.read()
         
+        print('tensorizing video')
         framesTensor = torch.cat([preprocess(Image.fromarray(frame)).unsqueeze(0) for frame in frames]).to(device)
         frameVectors = None
 
+        print('encoding video')
         with torch.no_grad():
             frameVectors = model.encode_image(framesTensor)
         
@@ -63,7 +65,7 @@ def upload():
         }
 
 
-@app.route("/search", methods=["GET"])
+@app.route('/search', methods=['GET'])
 def search():
     try:
         query = request.args.get('query')
@@ -85,11 +87,14 @@ def search():
             'success': False,
         }
 
-@app.route("/returnVideo")
-def returnVideo():
-    if upload() == True:
-        return 'video'
+
+@app.route('/video', methods=['GET'])
+def video():
+    if os.path.isfile('static/video.mp4'):
+        return send_file('static/video.mp4')
     else:
-        return 'please upload video'
+        return '', 204  # empty, no content
+
+
 if __name__ == '__main__':
    app.run()

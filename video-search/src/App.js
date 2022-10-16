@@ -1,8 +1,5 @@
 import Box from '@mui/material/Box';
-import AppBar from '@mui/material/AppBar';
-import Toolbar from '@mui/material/Toolbar';
-import AdbIcon from '@mui/icons-material/Adb';
-import Typography from '@mui/material/Typography';
+import axios from 'axios';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import { useState } from 'react';
 
@@ -13,7 +10,7 @@ const theme = createTheme({
   palette: {
     mode: 'dark',
     primary: {
-      main:"#00ec98"
+      main:"#00cc88"
     }
   }
 });
@@ -21,14 +18,21 @@ const theme = createTheme({
 
 export default function App() {
   const [videoPresent, setVideoPresent] = useState(false);
+  const [video, setVideo] = useState(null);
   const [timestampScores, setTimestampScores] = useState([]);
+  
+  axios.get('http://localhost:5000/video').then((res) => {
+    if (res.status % 200 == 0 && res.status != 204) {  // if there is content
+      setVideoPresent(true);
+    }
+  })
 
   return (
     <ThemeProvider theme={theme}>
       <Box
         sx={{
           backgroundColor: theme.palette.background.default,
-          height: '100vh',
+          minHeight: '100vh',
         }}
       >
         <Header
@@ -36,7 +40,7 @@ export default function App() {
           setVideoPresent={setVideoPresent}
           setTimestampScores={setTimestampScores}
         />
-        {videoPresent ? <Body timestampScores={timestampScores} /> : <></>}
+        {videoPresent ? <Body timestampScores={timestampScores} video={video} /> : <></>}
       </Box>
     </ThemeProvider>
   );
