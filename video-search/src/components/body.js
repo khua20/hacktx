@@ -1,6 +1,6 @@
 import React from 'react'
 import Grid from '@mui/material/Grid';
-
+import Grid from '@mui/material/Stack';
 import { CardMedia } from '@mui/material'
 import { Container } from '@mui/material'
 import { useTheme } from '@mui/material/styles';
