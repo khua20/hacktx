@@ -85,5 +85,11 @@ def search():
             'success': False,
         }
 
+@app.route("/returnVideo")
+def returnVideo():
+    if upload() == True:
+        return 'video'
+    else:
+        return 'please upload video'
 if __name__ == '__main__':
    app.run()
