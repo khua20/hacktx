@@ -18,56 +18,45 @@ const titleVariants = {
 }
 
 
-export default function Header({ videoPresent, setVideoPresent, setTimestampScores }) {
+export default function Header({ videoPresent, setVideoPresent, setTimestampScores, timestampsRef, setVideoName, videoNames, setVideoNames }) {
   const theme = useTheme();
 
   return (
     <Paper sx={{
       display: 'flex',
       flexDirection: videoPresent ? 'row' : 'column',
-      justifyContent: 'center',
+      justifyContent: videoPresent ? 'center' : 'flex-start',
       alignItems: 'center',
+      paddingTop: videoPresent ? '0%' : '7%',
       height: videoPresent ? '10vh' : '100vh',
+      position: 'relative',
+      zIndex: '2',
     }}>
-      <Title variant={titleVariants[videoPresent]} />
-      <Search hidden={!videoPresent} setTimestampScores={setTimestampScores} />
-      <UploadButton videoPresent={videoPresent} setVideoPresent={setVideoPresent} />
+      <Title videoPresent={videoPresent} />
+      <Search hidden={!videoPresent} setTimestampScores={setTimestampScores} timestampsRef={timestampsRef} />
+      <UploadButton videoPresent={videoPresent} setVideoPresent={setVideoPresent} setVideoName={setVideoName} videoNames={videoNames} setVideoNames={setVideoNames} />
     </Paper>
   )
 }
 
 
-function Title({ variant }) {
+function Title({ videoPresent }) {
   const theme = useTheme();
 
   return (
-    <Stack direction="row">
-      <Box
-        component="img"
-        sx={{
-          height: theme.typography[variant].fontSize,
-        }}
-        alt="logo"
-        src="https://www.w3.org/html/logo/downloads/HTML5_Logo_256.png"
-      />
-      <Typography
-        variant={variant}
-        noWrap
-        component="a"
-        sx={{
-          fontWeight: 700,
-          letterSpacing: '.3rem',
-          color: theme.palette.text.primary,
-          userSelect: 'none',
-        }}
-      >
-        VSearch
-      </Typography>
-    </Stack>
+    <Box
+      component="img"
+      sx={{
+        height: videoPresent ? '150%' : '50%',
+        marginTop: '0.4%',
+      }}
+      alt="logo"
+      src={ videoPresent ? '/logo small.png' : '/logo large.png' }
+    />
   )
 }
 
-function Search({ hidden, setTimestampScores }) {
+function Search({ hidden, setTimestampScores, timestampsRef }) {
   const [searchQuery, setSearchQuery] = useState('');
 
   return (
@@ -86,6 +75,7 @@ function Search({ hidden, setTimestampScores }) {
         }).then((res) => {
           if (res?.data?.success) {
             setTimestampScores(res.data.similarities)
+            timestampsRef.current.scrollIntoView()
           } else {
             console.log('sad :( something messed up :(((( sad by xxxtentacion')
           }
@@ -120,7 +110,7 @@ function Search({ hidden, setTimestampScores }) {
   )
 }
 
-function UploadButton({ videoPresent, setVideoPresent }) {
+function UploadButton({ videoPresent, setVideoPresent, setVideoName, videoNames, setVideoNames }) {
   const theme = useTheme();
 
   return (
@@ -130,7 +120,8 @@ function UploadButton({ videoPresent, setVideoPresent }) {
       sx={{
         paddingLeft: videoPresent ? '1%' : '10%',
         paddingRight: videoPresent ? '1%' : '10%',
-        marginTop: videoPresent ? '0%' : '4%',
+        marginTop: videoPresent ? '0%' : '0%',
+        borderRadius: '20px',
       }}
       component="label"
     >
@@ -154,8 +145,11 @@ function UploadButton({ videoPresent, setVideoPresent }) {
               data: bodyFormData,
               headers: { 'Content-Type': 'multipart/form-data' },
             }).then((res) => {
-              console.log('omg response!')
               setVideoPresent(res?.data?.success)
+              if (res?.data?.success) {
+                setVideoNames([ ...videoNames, e.target.files[0].name ])
+                setVideoName(e.target.files[0].name)
+              }
             })
           }}
         />
@@ -163,3 +157,5 @@ function UploadButton({ videoPresent, setVideoPresent }) {
     </Button>
   )
 }
+
+// #d371f3

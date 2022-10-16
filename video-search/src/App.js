@@ -1,7 +1,7 @@
 import Box from '@mui/material/Box';
 import axios from 'axios';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 
 import Header from './components/header'
 import Body from './components/body';
@@ -10,7 +10,8 @@ const theme = createTheme({
   palette: {
     mode: 'dark',
     primary: {
-      main:"#00cc88"
+      // main:"#00cc88",
+      main:'#d371f3',
     }
   }
 });
@@ -18,14 +19,36 @@ const theme = createTheme({
 
 export default function App() {
   const [videoPresent, setVideoPresent] = useState(false);
-  const [video, setVideo] = useState(null);
   const [timestampScores, setTimestampScores] = useState([]);
+  const [videoName, setVideoName] = useState('');
+  const [videoNames, setVideoNames] = useState([]);
+
+  const timestampsRef = useRef();
   
-  axios.get('http://localhost:5000/video').then((res) => {
-    if (res.status % 200 == 0 && res.status != 204) {  // if there is content
-      setVideoPresent(true);
-    }
-  })
+  useEffect(() => {
+    axios.get('http://localhost:5000/current').then((res) => {
+      if (res?.data?.success && res.data.current != null) {
+        setVideoPresent(true);
+        setVideoName(res.data.current)
+      } else {
+        setVideoPresent(false);
+      }
+    })
+    
+    axios.get('http://localhost:5000/analyzed').then((res) => {
+      if (res?.data?.success) {
+        setVideoNames(res.data.analyzed)
+        if (res.data.analyzed.length > 0) {
+          setVideoPresent(true);
+          setVideoName(res.data.current)
+        } else {
+          setVideoPresent(false);
+        }
+      } else {
+        setVideoPresent(false);
+      }
+    })
+  }, [])
 
   return (
     <ThemeProvider theme={theme}>
@@ -39,8 +62,21 @@ export default function App() {
           videoPresent={videoPresent}
           setVideoPresent={setVideoPresent}
           setTimestampScores={setTimestampScores}
+          timestampsRef={timestampsRef}
+          setVideoName={setVideoName}
+          videoNames={videoNames}
+          setVideoNames={setVideoNames}
         />
-        {videoPresent ? <Body timestampScores={timestampScores} video={video} /> : <></>}
+        {videoPresent ?
+          <Body
+            timestampScores={timestampScores}
+            timestampsRef={timestampsRef}
+            videoName={videoName}
+            setVideoName={setVideoName}
+            videoNames={videoNames}
+          />
+            :
+          <></>}
       </Box>
     </ThemeProvider>
   );

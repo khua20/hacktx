@@ -1,49 +1,109 @@
 import React from 'react'
 import Grid from '@mui/material/Grid';
 import Button from '@mui/material/Button';
+import Container from '@mui/material/Container';
+import Box from '@mui/material/Box';
 import { CardMedia } from '@mui/material'
-import { Container } from '@mui/material'
 import { useTheme } from '@mui/material/styles';
-import { Typography } from '@mui/material';
+import Tabs from '@mui/material/Tabs';
+import Tab from '@mui/material/Tab';
 import { useState, useEffect, useRef } from 'react';
+import axios from 'axios';
 
-const MINIMUM_SCORE = 2.8
+const MINIMUM_SCORE = 2.9
 
 
-export default function Body({ timestampScores }) {
+export default function Body({ timestampScores, timestampsRef, videoNames, videoName, setVideoName }) {
   const videoElement = useRef()
   return (
     <>
-      <UploadedVideo videoRef={videoElement} />
-      <Timestamps timestampScores={timestampScores} videoElement={videoElement} />
+      <Container
+        sx={{
+          position: 'relative',
+          zIndex: '2',
+        }}
+      >
+        <VideoTabs videoName={videoName} videoNames={videoNames} setVideoName={setVideoName} />
+        <UploadedVideo videoRef={videoElement} videoName={videoName} />
+        <Timestamps timestampsRef={timestampsRef} timestampScores={timestampScores} videoElement={videoElement} />
+      </Container>
+      <Box 
+        component="img"
+        sx={{
+          position: 'fixed',
+          top: '0%',
+          zIndex: '0',
+          opacity: '12%',
+        }}
+        alt="fish background"
+        src="fish background.png"
+      />
     </>
   )
 }
 
 
-export function UploadedVideo({ videoRef }) {
-  const theme = useTheme();
+export function VideoTabs({ videoName, setVideoName, videoNames }) {
+  const [tabs, setTabs] = useState(null);
+  useEffect(() => {
+    setTabs(videoNames.map((analyzedName) => {
+      return (
+        <Tab
+          label={analyzedName}
+          value={analyzedName}
+          key={analyzedName}
+        />
+      )
+    }))
+  }, [videoNames])
+
   return (
-    <Container>
-      <CardMedia
-        component="video"
-        controls
-        autoPlay
-        ref={videoRef}
-        src="http://localhost:5000/static/video.mp4"
-        sx={{
-          marginTop: "8vh",
-          maxHeight: "80vh",
-          marginBottom: '3%',
+    <Box sx={{ bgcolor: 'background.default' }}>
+      <Tabs
+        value={videoName}
+        variant="fullWidth"
+        onChange={(e, newValue) => {
+          setVideoName(newValue)
+          
+          axios.post('http://localhost:5000/current', { video: newValue }).then((res) => {
+            if (res?.data?.success) {
+              console.log(`set current to ${newValue}`)
+            } else {
+              console.log('sad :( something messed up :(((( sad by xxxtentacion')
+            }
+          })
         }}
-      />
-    </Container>
+        aria-label="video tabs"
+      >
+        {tabs}
+      </Tabs>
+    </Box>
   )
 }
 
 
+export function UploadedVideo({ videoRef, videoName }) {
+  useEffect(() => {
+    videoRef.current.load()
+  }, [videoName])
 
-export function Timestamps({ timestampScores, videoElement }) {
+  return (
+    <CardMedia
+      component="video"
+      controls
+      autoPlay
+      ref={videoRef}
+      src={`http://localhost:5000/static/${videoName}`}
+      sx={{
+        maxHeight: "80vh",
+        marginBottom: '3%',
+      }}
+    />
+  )
+}
+
+
+export function Timestamps({ timestampScores, videoElement, timestampsRef }) {
   const theme = useTheme();
   const [timestamps, setTimestamps] = useState([])
 
@@ -85,11 +145,11 @@ export function Timestamps({ timestampScores, videoElement }) {
   return (
     <Container
       sx={{
-        color: theme.palette.text.primary,
+        a: theme.palette.text.primary,
         marginTop:"1vh"
       }}
     >
-      <Grid container spacing={2}>
+      <Grid container spacing={2} ref={timestampsRef}>
         {timestamps}
       </Grid>
     </Container>
