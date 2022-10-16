@@ -11,10 +11,11 @@ export default function Body() {
 function UploadedVideo(){
   return (
     <div>
-        <video width="320" height="240" controls>
-            <source src="/movie.mp4" type="video/mp4"/>
-            
-        </video>
+        <CardMedia
+         component="video"
+         controls
+         src='video-search/public/movie.mp4'
+        />
     </div>
   )
 }
