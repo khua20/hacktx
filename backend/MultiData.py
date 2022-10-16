@@ -2,11 +2,13 @@
 
 from werkzeug.utils import secure_filename
 from flask import Flask, render_template, request
+from flask_cors import CORS
 import cv2
 import os
 
 
 app = Flask(__name__)
+CORS(app)
 
 
 @app.route('/')
@@ -28,7 +30,7 @@ def upload():
     listOfFrames = []
     while(True):
     # reading from frame
-        ret,frame = cam.read()
+        ret, frame = cam.read()
   
         if ret:
         # if video is still left continue creating images
@@ -45,13 +47,10 @@ def upload():
             currentframe += 1
         else:
             break
-  
-
-    f.stream.seek(0)
-    content = ""
-    for line in f.stream.readlines():
-        content += line.decode("UTF-8") # Decode here as needed
-    print(content)
+    
+    return {
+        'success': True,
+    }
 
 if __name__ == '__main__':
    app.run()

@@ -129,7 +129,15 @@ function UploadButton({ videoPresent, setVideoPresent }) {
           accept="video/*"
           type="file"
           onChange={(e) => {
-            axios.post('localhost:5000/upload')
+            const bodyFormData = new FormData();
+            bodyFormData.append('video', e.target.files[0]);
+
+            axios({
+              method: 'post',
+              url: 'http://localhost:5000/upload',
+              data: bodyFormData,
+              headers: { 'Content-Type': 'multipart/form-data' },
+            })
             console.log(e.target.files[0])
             setVideoPresent(true)
           }}
