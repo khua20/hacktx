@@ -21,6 +21,7 @@ const theme = createTheme({
 
 export default function App() {
   const [videoPresent, setVideoPresent] = useState(false);
+  const [timestampScores, setTimestampScores] = useState([]);
 
   return (
     <ThemeProvider theme={theme}>
@@ -30,8 +31,12 @@ export default function App() {
           height: '100vh',
         }}
       >
-        <Header videoPresent={videoPresent} setVideoPresent={setVideoPresent} />
-        {videoPresent ? <Body/> : <></>}
+        <Header
+          videoPresent={videoPresent}
+          setVideoPresent={setVideoPresent}
+          setTimestampScores={setTimestampScores}
+        />
+        {videoPresent ? <Body timestampScores={timestampScores} /> : <></>}
       </Box>
     </ThemeProvider>
   );

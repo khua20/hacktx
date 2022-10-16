@@ -77,6 +77,16 @@ function Search({ hidden }) {
         alignItems: 'center',
       }}
       hidden={hidden}
+      onSubmit={(e) => {
+        e.preventDefault()
+        axios.get('http://localhost:5000/search', {
+          params: {
+            query: searchQuery,
+          },
+        }).then((response) => {
+          console.log(response)
+        })
+      }}
     >
       <TextField
         id="search-bar"
@@ -122,6 +132,7 @@ function UploadButton({ videoPresent, setVideoPresent }) {
     >
       <Typography
         variant={videoPresent ? 'h6' : 'h4'}
+        sx={{color: theme.palette.text.primary}}
       >
         {videoPresent ? 'Upload' : 'Upload a video to start'}
         <input
@@ -129,17 +140,18 @@ function UploadButton({ videoPresent, setVideoPresent }) {
           accept="video/*"
           type="file"
           onChange={(e) => {
-            const bodyFormData = new FormData();
-            bodyFormData.append('video', e.target.files[0]);
-
-            axios({
-              method: 'post',
-              url: 'http://localhost:5000/upload',
-              data: bodyFormData,
-              headers: { 'Content-Type': 'multipart/form-data' },
-            })
-            console.log(e.target.files[0])
             setVideoPresent(true)
+            // const bodyFormData = new FormData();
+            // bodyFormData.append('video', e.target.files[0]);
+            
+            // axios({
+            //   method: 'post',
+            //   url: 'http://localhost:5000/upload',
+            //   data: bodyFormData,
+            //   headers: { 'Content-Type': 'multipart/form-data' },
+            // }).then((res) => {
+            //   setVideoPresent(res?.data?.success)
+            // })
           }}
         />
       </Typography>
