@@ -14,7 +14,7 @@ function UploadedVideo(){
         <CardMedia
          component="video"
          controls
-         src='video-search/public/movie.mp4'
+         src='/movie.mp4'
         />
     </div>
   )
